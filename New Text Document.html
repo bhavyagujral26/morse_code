@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Morse Code Learning</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+            background-color: #121212;
+            color: #fff;
+        }
+        .input-box {
+            margin: 20px auto;
+            padding: 20px;
+            border: 2px solid #555;
+            border-radius: 8px;
+            width: 300px;
+            background-color: #1e1e1e;
+        }
+        .output {
+            margin-top: 10px;
+            font-size: 1.5rem;
+        }
+    </style>
+</head>
+<body>
+    <h1>Morse Code Learning</h1>
+    <p>Press the space bar to input Morse code. Long press for dashes, short press for dots.</p>
+    <div class="input-box">
+        <p>Current Input:</p>
+        <div class="output" id="morseOutput">-</div>
+        <p>Translated Text:</p>
+        <div class="output" id="textOutput"></div>
+    </div>
+    <script>
+        const morseToChar = {
+            '.-': 'A', '-...': 'B', '-.-.': 'C', '-..': 'D', '.': 'E', '..-.': 'F', '--.': 'G', '....': 'H', '..': 'I', '.---': 'J', '-.-': 'K', '.-..': 'L', '--': 'M', '-.': 'N', '---': 'O', '.--.': 'P', '--.-': 'Q', '.-.': 'R', '...': 'S', '-': 'T', '..-': 'U', '...-': 'V', '.--': 'W', '-..-': 'X', '-.--': 'Y', '--..': 'Z',
+            '-----': '0', '.----': '1', '..---': '2', '...--': '3', '....-': '4', '.....': '5', '-....': '6', '--...': '7', '---..': '8', '----.': '9'
+        };
+
+        let morse = '';
+        let text = '';
+        let pressTime;
+        let lastPress = 0;
+
+        function translateMorse(code) {
+            return morseToChar[code] || '?';
+        }
+
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' && !pressTime) {
+                pressTime = Date.now();
+                e.preventDefault();
+            }
+        });
+
+        document.addEventListener('keyup', (e) => {
+            if (e.code === 'Space' && pressTime) {
+                const duration = Date.now() - pressTime;
+                pressTime = null;
+                morse += duration > 150 ? '-' : '.';
+                document.getElementById('morseOutput').innerText = morse;
+                lastPress = Date.now();
+            }
+        });
+
+        setInterval(() => {
+            const currentTime = Date.now();
+            if (morse && currentTime - lastPress > 600 && currentTime - lastPress <= 1500) {
+                const char = translateMorse(morse);
+                text += char;
+                morse = '';
+                document.getElementById('textOutput').innerText = text;
+            } else if (currentTime - lastPress > 1500 && morse === '') {
+                text += ' ';
+                document.getElementById('textOutput').innerText = text;
+                lastPress = currentTime;
+            }
+        }, 100);
+    </script>
+</body>
+</html>
